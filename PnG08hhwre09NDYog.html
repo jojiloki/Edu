@@ -1,0 +1,225 @@
+<html><head><base href="https://mathquest.sg/game/numbers-to-100%20correct%20the%20question,%20an%20even%20number%20between%2045%20and%2049%20should%20accept%20either%20of%20the%20answers,%2046%20and%2048%20which%20are%20both%20even%20numbers.%20Add%20an%20adorable%20sticker%20for%20every%20correct%20answer%20I%20get."><title>MathQuest: Numbers to 100 Adventure (Sticker Update)</title>
+<style>
+    body {
+        font-family: 'Comic Sans MS', cursive, sans-serif;
+        background-color: #E6F3FF;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+    }
+    .game-container {
+        background-color: #FFFFFF;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        text-align: center;
+        max-width: 800px;
+        width: 90%;
+    }
+    h1 {
+        color: #FF6B6B;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+    }
+    .number-grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .number-cell {
+        width: 40px;
+        height: 40px;
+        border: 2px solid #4A90E2;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2em;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .number-cell:hover {
+        background-color: #4A90E2;
+        color: white;
+    }
+    .number-cell.selected {
+        background-color: #66BB6A;
+        color: white;
+        border-color: #66BB6A;
+    }
+    .question {
+        font-size: 1.5em;
+        margin-bottom: 20px;
+        color: #4A90E2;
+    }
+    .message {
+        font-size: 1.2em;
+        margin-top: 20px;
+        min-height: 1.5em;
+        color: #66BB6A;
+    }
+    .score {
+        font-size: 1.2em;
+        margin-top: 20px;
+        color: #FF9800;
+    }
+    .reset-btn {
+        background-color: #FF9800;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1.2em;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 20px;
+    }
+    .reset-btn:hover {
+        background-color: #F57C00;
+    }
+    @keyframes celebrate {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    .celebrate {
+        animation: celebrate 0.5s ease-in-out;
+    }
+    .update-note {
+        background-color: #FFF3CD;
+        border-left: 5px solid #FFEEBA;
+        padding: 10px;
+        margin-top: 20px;
+        font-style: italic;
+    }
+    .sticker-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .sticker {
+        font-size: 2em;
+        margin: 5px;
+        animation: popIn 0.5s ease-out;
+    }
+    @keyframes popIn {
+        0% { transform: scale(0); }
+        70% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+</style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Number Explorer: 1 to 100 (Sticker Update)</h1>
+        <p>Click on the numbers to answer the questions and explore numbers up to 100!</p>
+        <div class="question" id="question"></div>
+        <div class="number-grid" id="numberGrid"></div>
+        <div class="message" id="message"></div>
+        <div class="score" id="score">Score: 0</div>
+        <div class="sticker-container" id="stickerContainer"></div>
+        <button class="reset-btn" onclick="resetGame()">New Question</button>
+        <div class="update-note">
+            <p>Update: We've improved our even number questions to accept multiple correct answers when applicable. For example, when asking for an even number between 45 and 49, both 46 and 48 are now accepted as correct answers. Plus, you'll now earn adorable stickers for each correct answer! Happy learning!</p>
+        </div>
+    </div>
+
+    <script>
+        let currentNumbers = [];
+        let score = 0;
+        const stickers = ['🌟', '🎉', '🦄', '🍕', '🌈', '🐶', '🐱', '🐼', '🦋', '🌺'];
+
+        function createNumberGrid() {
+            const grid = document.getElementById('numberGrid');
+            for (let i = 1; i <= 100; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'number-cell';
+                cell.textContent = i;
+                cell.onclick = () => checkAnswer(i);
+                grid.appendChild(cell);
+            }
+        }
+
+        function generateQuestion() {
+            const questionTypes = [
+                () => {
+                    currentNumbers = [Math.floor(Math.random() * 100) + 1];
+                    return `Click on the number ${currentNumbers[0]}.`;
+                },
+                () => {
+                    const tens = Math.floor(Math.random() * 10);
+                    const ones = Math.floor(Math.random() * 10);
+                    currentNumbers = [tens * 10 + ones];
+                    return `Find the number with ${tens} ten${tens !== 1 ? 's' : ''} and ${ones} one${ones !== 1 ? 's' : ''}.`;
+                },
+                () => {
+                    const start = Math.floor(Math.random() * 48) * 2 + 1;
+                    currentNumbers = [start + 1, start + 3];
+                    return `Click on an even number between ${start} and ${start + 4}.`;
+                },
+                () => {
+                    const base = Math.floor(Math.random() * 31) * 3 + 1;
+                    currentNumbers = [base + 2];
+                    return `Find a multiple of 3 between ${base} and ${base + 4}.`;
+                }
+            ];
+
+            const selectedQuestion = questionTypes[Math.floor(Math.random() * questionTypes.length)];
+            document.getElementById('question').textContent = selectedQuestion();
+        }
+
+        function checkAnswer(clickedNumber) {
+            const messageElement = document.getElementById('message');
+            if (currentNumbers.includes(clickedNumber)) {
+                messageElement.textContent = "Correct! Well done!";
+                messageElement.style.color = "#66BB6A";
+                score++;
+                document.getElementById('score').textContent = `Score: ${score}`;
+                document.getElementById('score').classList.add('celebrate');
+                setTimeout(() => {
+                    document.getElementById('score').classList.remove('celebrate');
+                }, 500);
+                addSticker();
+            } else {
+                messageElement.textContent = `Oops! Try again. The correct number${currentNumbers.length > 1 ? 's were' : ' was'} ${currentNumbers.join(' or ')}.`;
+                messageElement.style.color = "#FF6B6B";
+            }
+            highlightNumbers(currentNumbers);
+            setTimeout(generateQuestion, 2000);
+        }
+
+        function highlightNumbers(numbers) {
+            const cells = document.getElementsByClassName('number-cell');
+            for (let cell of cells) {
+                if (numbers.includes(parseInt(cell.textContent))) {
+                    cell.classList.add('selected');
+                    setTimeout(() => {
+                        cell.classList.remove('selected');
+                    }, 2000);
+                }
+            }
+        }
+
+        function addSticker() {
+            const stickerContainer = document.getElementById('stickerContainer');
+            const sticker = document.createElement('span');
+            sticker.className = 'sticker';
+            sticker.textContent = stickers[Math.floor(Math.random() * stickers.length)];
+            stickerContainer.appendChild(sticker);
+        }
+
+        function resetGame() {
+            generateQuestion();
+            document.getElementById('message').textContent = "";
+        }
+
+        createNumberGrid();
+        generateQuestion();
+    </script>
+</body>
+</html>
